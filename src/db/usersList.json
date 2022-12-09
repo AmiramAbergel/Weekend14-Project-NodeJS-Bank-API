@@ -84,8 +84,8 @@
         "first": "Elijah",
         "last": "Bogan",
         "bank_acc_num": "834b77af-0964-44c6-a873-c3d1ef7db7ce",
-        "credit": 9,
-        "cash": 900,
+        "credit": 0,
+        "cash": 0,
         "isActive": true,
         "id": "10"
     },

@@ -82,7 +82,7 @@ export const updateUserCash = (req, res) => {
     if (!req.params.id || !req.body.cash) {
         return res.status(400).json({
             status: 'fail',
-            message: 'id of cash data missing...',
+            message: 'id or cash data missing...',
         });
     }
     const userID = req.params.id;
@@ -92,7 +92,62 @@ export const updateUserCash = (req, res) => {
     writeData(usersDataJSON);
     res.status(200).json({
         status: 'success',
-        message: 'user Updated',
+        message: 'user cash updated',
+    });
+};
+
+export const updateUserCredit = (req, res) => {
+    if (!req.params.id || !req.body.credit) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'id or cash data missing...',
+        });
+    }
+    if (req.body.credit < 1) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Only positive numbers can be used for credit',
+        });
+    }
+    const userID = req.params.id;
+    const creditAmount = req.body.credit;
+    const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
+    userByID.credit = creditAmount;
+    writeData(usersDataJSON);
+    res.status(200).json({
+        status: 'success',
+        message: 'user credit updated',
+    });
+};
+
+export const withdrawFromUser = (req, res) => {
+    if (!req.params.id || !req.body.withdraw) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'id or cash data missing...',
+        });
+    }
+    const userID = req.params.id;
+    const withdrawAmount = req.body.withdraw;
+    const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
+    const userCashCredit = userByID.credit + userByID.cash;
+    if (withdrawAmount < 1 || userCashCredit < withdrawAmount) {
+        return res.status(400).json({
+            status: 'fail',
+            message:
+                'Only positive numbers can be used for withdraw and not more than user total funding ',
+        });
+    }
+    if (userByID.cash <= withdrawAmount) {
+        userByID.credit = userByID.credit - (withdrawAmount - userByID.cash);
+        userByID.cash = 0;
+    } else {
+        userByID.cash = userByID.cash - withdrawAmount;
+    }
+    writeData(usersDataJSON);
+    res.status(200).json({
+        status: 'success',
+        message: 'user credit and cash updated after withdraw',
     });
 };
 

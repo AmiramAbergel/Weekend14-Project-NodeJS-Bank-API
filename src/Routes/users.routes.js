@@ -6,9 +6,9 @@ import {
     deleteUser,
     getAllUsers,
     getUserByID,
-    getUserCash,
-    getUserCredit,
     updateUserCash,
+    updateUserCredit,
+    withdrawFromUser,
 } from '../controllers/usersController.js';
 export const usersRouter = Router();
 
@@ -20,5 +20,6 @@ usersRouter
     .get(getUserByID)
     .patch(updateUserCash)
     .delete(deleteUser); // read specific user | update user | delete user
-usersRouter.route(`/:id/credit`).get(getUserCredit); // read credit
-usersRouter.route(`/:id/cash`).get(getUserCash); // read cash
+usersRouter.route(`/credit/:id`).patch(updateUserCredit);
+usersRouter.route(`/cash/:id`).patch(updateUserCash);
+usersRouter.route(`/withdraw/:id`).patch(withdrawFromUser);
