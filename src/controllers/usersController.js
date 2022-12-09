@@ -45,7 +45,6 @@ export const getAllUsers = (req, res) => {
 export const getUserByID = (req, res) => {
     const userID = req.params.id;
     const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
-
     console.log(userByID);
     res.status(200).json({
         status: 'success',
@@ -54,22 +53,7 @@ export const getUserByID = (req, res) => {
         },
     });
 };
-export const getUserCredit = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-    });
-};
-export const getUserCash = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-    });
-};
 
-export const updateUser = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-    });
-};
 export const addNewUser = (req, res) => {
     const newUserID = (
         +usersDataJSON[usersDataJSON.length - 1].id + 1
@@ -85,10 +69,39 @@ export const addNewUser = (req, res) => {
             { id: newUserID, bank_acc_num: newUserBankAcc, credit: 0, cash: 0 },
             req.body
         );
-        usersDataJSON.push(newUser);
-        writeData(usersDataJSON, userObj(newUser));
+        usersDataJSON.push(userObj(newUser));
+        writeData(usersDataJSON);
     }
+    res.status(200).json({
+        status: 'success',
+        message: 'New user added',
+    });
+};
 
+export const updateUserCash = (req, res) => {
+    if (!req.params.id || !req.body.cash) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'id of cash data missing...',
+        });
+    }
+    const userID = req.params.id;
+    const depositAmount = req.body.cash;
+    const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
+    userByID.cash = depositAmount;
+    writeData(usersDataJSON);
+    res.status(200).json({
+        status: 'success',
+        message: 'user Updated',
+    });
+};
+
+export const getUserCredit = (req, res) => {
+    res.status(200).json({
+        status: 'success',
+    });
+};
+export const getUserCash = (req, res) => {
     res.status(200).json({
         status: 'success',
     });
