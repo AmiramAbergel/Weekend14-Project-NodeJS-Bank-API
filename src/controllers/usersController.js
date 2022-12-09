@@ -1,5 +1,17 @@
 import { usersDataJSON } from '../utils/readData.js';
 
+export const checkID = (req, res, next, val) => {
+    console.log(`Tour id is: ${val}`);
+
+    if (+req.params.id > usersDataJSON.length) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID',
+        });
+    }
+    next();
+};
+
 export const getAllUsers = (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -18,7 +30,7 @@ export const getUserByID = (req, res) => {
     res.status(200).json({
         status: 'success',
         requestedAt: req.requestTime,
-        results: usersDataJSON.length,
+        results: 1,
         data: {
             usersDataJSON,
         },
