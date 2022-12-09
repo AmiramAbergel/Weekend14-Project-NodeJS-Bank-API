@@ -88,7 +88,7 @@ export const updateUserCash = (req, res) => {
     const userID = req.params.id;
     const depositAmount = req.body.cash;
     const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
-    userByID.cash = depositAmount;
+    userByID.cash += depositAmount;
     writeData(usersDataJSON);
     res.status(200).json({
         status: 'success',
