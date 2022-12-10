@@ -1,6 +1,12 @@
 import { usersDataJSON, writeData } from '../utils/readWriteData.js';
 import { v4 as uuidv4 } from 'uuid';
 import userObj from '../model/user.js';
+import {
+    cashOrCreditExpense,
+    findUser,
+    fundsAvailability,
+    sumCashCredit,
+} from '../utils/bankManagerUtils.js';
 
 export const checkID = (req, res, next, val) => {
     console.log(`User id is: ${val}`);
@@ -44,8 +50,7 @@ export const getAllUsers = (req, res) => {
 
 export const getUserByID = (req, res) => {
     const userID = req.params.id;
-    const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
-    console.log(userByID);
+    const userByID = findUser(userID);
     res.status(200).json({
         status: 'success',
         data: {
@@ -79,15 +84,15 @@ export const addNewUser = (req, res) => {
 };
 
 export const updateUserCash = (req, res) => {
-    if (!req.params.id || !req.body.cash) {
+    const userID = req.params.id;
+    const depositAmount = req.body.cash;
+    if (!userID || !depositAmount) {
         return res.status(400).json({
             status: 'fail',
             message: 'id or cash data missing...',
         });
     }
-    const userID = req.params.id;
-    const depositAmount = req.body.cash;
-    const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
+    const userByID = findUser(userID);
     userByID.cash += depositAmount;
     writeData(usersDataJSON);
     res.status(200).json({
@@ -97,21 +102,21 @@ export const updateUserCash = (req, res) => {
 };
 
 export const updateUserCredit = (req, res) => {
-    if (!req.params.id || !req.body.credit) {
+    const userID = req.params.id;
+    const creditAmount = req.body.credit;
+    if (!userID || !creditAmount) {
         return res.status(400).json({
             status: 'fail',
             message: 'id or cash data missing...',
         });
     }
-    if (req.body.credit < 1) {
+    if (creditAmount < 1) {
         return res.status(400).json({
             status: 'fail',
             message: 'Only positive numbers can be used for credit',
         });
     }
-    const userID = req.params.id;
-    const creditAmount = req.body.credit;
-    const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
+    const userByID = findUser(userID);
     userByID.credit = creditAmount;
     writeData(usersDataJSON);
     res.status(200).json({
@@ -121,29 +126,24 @@ export const updateUserCredit = (req, res) => {
 };
 
 export const withdrawFromUser = (req, res) => {
-    if (!req.params.id || !req.body.withdraw) {
+    const userID = req.params.id;
+    const withdrawAmount = req.body.withdraw;
+    if (!userID || !withdrawAmount) {
         return res.status(400).json({
             status: 'fail',
             message: 'id or cash data missing...',
         });
     }
-    const userID = req.params.id;
-    const withdrawAmount = req.body.withdraw;
-    const userByID = usersDataJSON.find((userDB) => userDB.id === userID);
-    const userCashCredit = userByID.credit + userByID.cash;
-    if (withdrawAmount < 1 || userCashCredit < withdrawAmount) {
+    const userByID = findUser(userID);
+    const userCashCredit = sumCashCredit(userByID.credit, userByID.cash);
+    if (!fundsAvailability(userCashCredit, withdrawAmount)) {
         return res.status(400).json({
             status: 'fail',
             message:
                 'Only positive numbers can be used for withdraw and not more than user total funding ',
         });
     }
-    if (userByID.cash <= withdrawAmount) {
-        userByID.credit = userByID.credit - (withdrawAmount - userByID.cash);
-        userByID.cash = 0;
-    } else {
-        userByID.cash = userByID.cash - withdrawAmount;
-    }
+    cashOrCreditExpense(userByID, withdrawAmount);
     writeData(usersDataJSON);
     res.status(200).json({
         status: 'success',
@@ -155,31 +155,20 @@ export const transferMoney = (req, res) => {
     const senderUserID = req.query.sender_id;
     const receiverUserID = req.query.receiver_id;
     const transferAmount = req.body.amount;
-
-    const findSenderUserByID = usersDataJSON.find(
-        (userDB) => userDB.id === senderUserID
+    const findSenderUserByID = findUser(senderUserID);
+    const findReceiverUserByID = findUser(receiverUserID);
+    const senderUserCashCredit = sumCashCredit(
+        findSenderUserByID.credit,
+        findSenderUserByID.cash
     );
-    const findReceiverUserByID = usersDataJSON.find(
-        (userDB) => userDB.id === receiverUserID
-    );
-    const senderUserCashCredit =
-        findSenderUserByID.credit + findSenderUserByID.cash;
-    if (transferAmount < 1 || senderUserCashCredit < transferAmount) {
+    if (!fundsAvailability(senderUserCashCredit, transferAmount)) {
         return res.status(400).json({
             status: 'fail',
             message:
-                'Only positive numbers can be used for withdraw and not more than user total funding ',
+                'Only positive numbers can be used for withdraw and not more than user total funding',
         });
     }
-    if (senderUserCashCredit.cash <= transferAmount) {
-        findSenderUserByID.credit =
-            findSenderUserByID.credit -
-            (transferAmount - findSenderUserByID.cash);
-        findSenderUserByID.cash = 0;
-    } else {
-        findSenderUserByID.cash = findSenderUserByID.cash - transferAmount;
-    }
-
+    cashOrCreditExpense(findSenderUserByID, transferAmount);
     findReceiverUserByID.cash += transferAmount;
     writeData(usersDataJSON);
     res.status(200).json({
@@ -188,6 +177,10 @@ export const transferMoney = (req, res) => {
     });
 };
 
+/////
+///
+///
+///
 export const getUserCredit = (req, res) => {
     res.status(200).json({
         status: 'success',
