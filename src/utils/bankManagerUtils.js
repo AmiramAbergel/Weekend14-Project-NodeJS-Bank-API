@@ -22,6 +22,6 @@ export const cashOrCreditExpense = (user, amount) => {
         user.credit = user.credit - (amount - user.cash);
         user.cash = 0;
     } else {
-        user.cash = user.cash - user.amount;
+        user.cash = user.cash - amount;
     }
 };
