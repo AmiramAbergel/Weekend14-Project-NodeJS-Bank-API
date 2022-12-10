@@ -67,7 +67,7 @@
         "last": "Littel",
         "bank_acc_num": "4da50e27-2446-4fa4-af90-c236fb3b6954",
         "credit": 9,
-        "cash": 4,
+        "cash": 28,
         "isActive": false,
         "id": "8"
     },
@@ -76,7 +76,7 @@
         "last": "Okuneva",
         "bank_acc_num": "be777271-016c-4493-b49a-65280b2ae426",
         "credit": 37,
-        "cash": 24,
+        "cash": 0,
         "isActive": false,
         "id": "9"
     },

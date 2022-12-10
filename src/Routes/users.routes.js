@@ -6,12 +6,13 @@ import {
     deleteUser,
     getAllUsers,
     getUserByID,
+    transferMoney,
     updateUserCash,
     updateUserCredit,
     withdrawFromUser,
 } from '../controllers/usersController.js';
 export const usersRouter = Router();
-
+usersRouter.route(`/transfer`).patch(transferMoney);
 usersRouter.param('id', checkID);
 // all routes in here are starting with localhost:8000/api/v1/users
 usersRouter.route(`/`).get(getAllUsers).post(addNewUser); //get all users and add new user

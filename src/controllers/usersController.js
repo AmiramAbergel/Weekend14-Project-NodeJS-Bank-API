@@ -49,7 +49,7 @@ export const getUserByID = (req, res) => {
     res.status(200).json({
         status: 'success',
         data: {
-            usersDataJSON,
+            userByID,
         },
     });
 };
@@ -148,6 +148,43 @@ export const withdrawFromUser = (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'user credit and cash updated after withdraw',
+    });
+};
+
+export const transferMoney = (req, res) => {
+    const senderUserID = req.query.sender_id;
+    const receiverUserID = req.query.receiver_id;
+    const transferAmount = req.body.amount;
+
+    const findSenderUserByID = usersDataJSON.find(
+        (userDB) => userDB.id === senderUserID
+    );
+    const findReceiverUserByID = usersDataJSON.find(
+        (userDB) => userDB.id === receiverUserID
+    );
+    const senderUserCashCredit =
+        findSenderUserByID.credit + findSenderUserByID.cash;
+    if (transferAmount < 1 || senderUserCashCredit < transferAmount) {
+        return res.status(400).json({
+            status: 'fail',
+            message:
+                'Only positive numbers can be used for withdraw and not more than user total funding ',
+        });
+    }
+    if (senderUserCashCredit.cash <= transferAmount) {
+        findSenderUserByID.credit =
+            findSenderUserByID.credit -
+            (transferAmount - findSenderUserByID.cash);
+        findSenderUserByID.cash = 0;
+    } else {
+        findSenderUserByID.cash = findSenderUserByID.cash - transferAmount;
+    }
+
+    findReceiverUserByID.cash += transferAmount;
+    writeData(usersDataJSON);
+    res.status(200).json({
+        status: 'success',
+        message: 'Transfer completed',
     });
 };
 
