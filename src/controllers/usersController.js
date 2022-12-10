@@ -60,23 +60,27 @@ export const getUserByID = (req, res) => {
 };
 
 export const addNewUser = (req, res) => {
+    const newUserData = req.body;
     const newUserID = (
         +usersDataJSON[usersDataJSON.length - 1].id + 1
     ).toString(); //In the local database, get the ID of the last user, increase it by 1, and make it into a string
     const newUserBankAcc = uuidv4();
+    console.log(+usersDataJSON[usersDataJSON.length - 1].id + 1);
     if (checkIfExists(newUserID, newUserBankAcc)) {
         return res.status(400).json({
             status: 'fail',
             message: 'Cannot add duplicate users',
         });
     } else {
-        const newUser = Object.assign(
+        const updatedNewUser = Object.assign(
             { id: newUserID, bank_acc_num: newUserBankAcc, credit: 0, cash: 0 },
-            req.body
+            newUserData
         );
-        usersDataJSON.push(userObj(newUser));
+        console.log(updatedNewUser);
+        usersDataJSON.push(updatedNewUser);
         writeData(usersDataJSON);
     }
+
     res.status(200).json({
         status: 'success',
         message: 'New user added',

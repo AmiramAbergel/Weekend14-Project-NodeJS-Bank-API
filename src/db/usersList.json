@@ -91,22 +91,20 @@
     },
     {
         "id": "11",
-        "bank_acc_num": "165ef0af-959a-4e3d-9556-b44745f612b7",
+        "bank_acc_num": "fd6624d4-4ff2-4b01-ba22-848465d25c7b",
         "credit": 0,
         "cash": 0,
-        "first": "Al",
-        "last": "MacGyver",
+        "first": "Amiram",
+        "last": "Abergel",
         "isActive": true
     },
     {
-        "first": {
-            "id": "12",
-            "bank_acc_num": "21f9bc54-6caf-477d-9fe4-c4381887c11f",
-            "credit": 0,
-            "cash": 0,
-            "first": "Al",
-            "last": "MacGyver",
-            "isActive": true
-        }
+        "id": "12",
+        "bank_acc_num": "d77838e1-5a78-4fa0-8375-dad3ad410cc3",
+        "credit": 0,
+        "cash": 0,
+        "first": "Amiram",
+        "last": "Abergel",
+        "isActive": true
     }
 ]
